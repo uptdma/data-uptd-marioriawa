@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Form Input Data – Koordinator UPTD Marioriawa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<header class="bg-gradient-to-r from-indigo-700 to-blue-600 text-white py-10 shadow-lg">
+  <div class="max-w-7xl mx-auto px-6">
+    <h1 class="text-4xl font-extrabold tracking-wide">FORM INPUT DATA</h1>
+    <p class="text-lg opacity-90 mt-2">Koordinator UPTD Kecamatan Marioriawa</p>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-10 space-y-10">
+
+  <section class="bg-white rounded-2xl shadow-xl p-8">
+    <h2 class="text-2xl font-bold text-indigo-700 mb-6">Identitas Sekolah</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="font-semibold">Nomor Sekolah</label>
+        <select id="nomorSekolah" class="w-full mt-2 border-2 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500">
+          <option value="">Pilih Nomor Sekolah</option>
+        </select>
+      </div>
+      <div>
+        <label class="font-semibold">Nama Sekolah</label>
+        <input id="namaSekolah" class="w-full mt-2 border-2 rounded-xl p-3 bg-gray-100" readonly />
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white rounded-2xl shadow-xl p-8 space-y-10">
+    <h2 class="text-2xl font-bold text-indigo-700">Data Sekolah</h2>
+
+    <div id="kelasSD"></div>
+    <div id="kelasTK" class="hidden"></div>
+
+    <div id="rombelSD"></div>
+    <div id="rombelTK" class="hidden"></div>
+
+    <div id="asnSD"></div>
+    <div id="asnTK" class="hidden"></div>
+
+    <div id="kebutuhanSD"></div>
+    <div id="kebutuhanTK" class="hidden"></div>
+
+    <div id="kekuranganSD"></div>
+    <div id="kekuranganTK" class="hidden"></div>
+
+    <div id="guruSD"></div>
+    <div id="guruTK" class="hidden"></div>
+  </section>
+
+  <section class="bg-white rounded-2xl shadow-xl p-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <button class="bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl text-lg font-bold">💾 Simpan Data</button>
+      <button id="btnDashboard" class="bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl text-lg font-bold">📊 Dashboard</button>
+    </div>
+  </section>
+
+  <section id="dashboard" class="hidden bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <h2 class="text-2xl font-bold text-indigo-700">Dashboard Rekapitulasi</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-indigo-50 border-l-8 border-indigo-600 rounded-xl p-6">
+        <p class="text-gray-500">Total ASN</p>
+        <p id="cardASN" class="text-3xl font-extrabold text-indigo-700">0</p>
+      </div>
+      <div class="bg-emerald-50 border-l-8 border-emerald-600 rounded-xl p-6">
+        <p class="text-gray-500">Total Kebutuhan</p>
+        <p id="cardKebutuhan" class="text-3xl font-extrabold text-emerald-700">0</p>
+      </div>
+      <div class="bg-rose-50 border-l-8 border-rose-600 rounded-xl p-6">
+        <p class="text-gray-500">Total Kekurangan</p>
+        <p id="cardKekurangan" class="text-3xl font-extrabold text-rose-700">0</p>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <canvas id="chartDashboard" height="120"></canvas>
+    </div>
+  </section>
+
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const sekolah = {
+    1:'SD Negeri 47 Lamarung',2:'SD Negeri 48 Latappareng',3:'SD Negeri 49 Paria',4:'SD Negeri 50 Tarawang',5:'SD Negeri 51 Tonronge',6:'SD Negeri 52 Welonge',7:'SD Negeri 53 Lajarella',8:'SD Negeri 54 Bolamallimponge',9:'SD Negeri 56 Madining',10:'SD Negeri 57 Kaca',11:'SD Negeri 58 Padali',12:'SD Negeri 59 Penre',13:'SD Negeri 60 Panincong',14:'SD Negeri 61 Kampung Baru',15:'SD Negeri 62 Lompo Panincong',16:'SD Negeri 63 Kawarang',17:'SD Negeri 64 Medde',18:'SD Negeri 66 Mario',19:'SD Negeri 160 Attang Salo',20:'SD Negeri 169 Sumpang Pala',21:'SD Negeri 170 Tanete',22:'SD Negeri 171 Lompo Baru',23:'SD Negeri 185 Cilellang',24:'SD Negeri 186 Taluma Kaca',25:'SD Negeri 200 Bulue',26:'SD Negeri 227 Bera',27:'SD Negeri 248 Laulaweng',28:'SD Negeri 249 Mattirobulu',29:'TK Negeri We Temmauleng',30:'TK DDI Kawarang',31:'TK PKK Bulue',32:'TK Handayani Welonge',33:'TK PKK Jabar Ridho Bera',34:'PAUD Harapan Bangsa Limpomajang',35:'PAUD AL-Amin Lejja',36:'PAUD Farhan Panincong',37:'RA Perwanida 2 Batu-Batu',38:'RA Perwanida 4 Madining'
+  };
+
+  const nomor = document.getElementById('nomorSekolah');
+  const nama = document.getElementById('namaSekolah');
+
+  Object.keys(sekolah).forEach(k => {
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = k + ' - ' + sekolah[k];
+    nomor.appendChild(o);
+  });
+
+  function buatTabel(id, judul, kolom) {
+    const div = document.getElementById(id);
+    div.innerHTML = `
+      <div class="overflow-x-auto">
+        <h3 class="text-xl font-bold text-gray-700 mb-3">${judul}</h3>
+        <table class="min-w-full border rounded-xl overflow-hidden">
+          <thead class="bg-indigo-600 text-white">
+            <tr>
+              ${kolom.map(c => `<th class="p-3">${c}</th>`).join('')}
+              <th class="p-3">Jumlah</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-gray-50">
+              ${kolom.map(() => '<td class="p-2"><select class="angka w-full border rounded-lg p-2 text-center"></select></td>').join('')}
+              <td class="p-2"><input class="total w-full text-center font-bold bg-gray-200 rounded-lg" readonly></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
+
+    const selects = div.querySelectorAll('.angka');
+    const total = div.querySelector('.total');
+
+    selects.forEach(s => {
+      for (let i = 0; i <= 50; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i;
+        s.appendChild(opt);
+      }
+      s.value = 0;
+      s.addEventListener('change', () => {
+        let sum = 0;
+        selects.forEach(x => sum += Number(x.value || 0));
+        total.value = sum;
+      });
+    });
+  }
+
+  buatTabel('kelasSD','Kelas SD',['1','2','3','4','5','6']);
+  buatTabel('kelasTK','Kelompok TK',['A','B','A1','B1']);
+  buatTabel('rombelSD','Rombel SD',['1','2','3','4','5','6']);
+  buatTabel('rombelTK','Rombel TK',['1','2','3','4']);
+  buatTabel('asnSD','ASN SD',['KS','GK','GO','GA']);
+  buatTabel('asnTK','ASN TK',['KS','GK']);
+  buatTabel('kebutuhanSD','Kebutuhan SD',['KS','GK','GO','GA']);
+  buatTabel('kebutuhanTK','Kebutuhan TK',['KS','GK']);
+  buatTabel('kekuranganSD','Kekurangan SD',['KS','GK','GO','GA']);
+  buatTabel('kekuranganTK','Kekurangan TK',['KS','GK']);
+  buatTabel('guruSD','Data Guru & Pendukung SD',['GK','GM','GO','GA','Perpus','Operator','Penjaga']);
+  buatTabel('guruTK','Data Guru & Pendukung TK',['GK','ADM']);
+
+  nomor.addEventListener('change', () => {
+    const n = Number(nomor.value);
+    nama.value = sekolah[n] || '';
+    const isTK = n >= 29;
+
+    ['kelas','rombel','asn','kebutuhan','kekurangan','guru'].forEach(x => {
+      document.getElementById(x+'SD').classList.toggle('hidden', isTK);
+      document.getElementById(x+'TK').classList.toggle('hidden', !isTK);
+    });
+  });
+
+  document.getElementById('btnDashboard').addEventListener('click', () => {
+    const dashboard = document.getElementById('dashboard');
+    dashboard.classList.remove('hidden');
+    dashboard.scrollIntoView({ behavior: 'smooth' });
+
+    const getTotal = id => {
+      const el = document.getElementById(id);
+      return el ? Number(el.querySelector('.total')?.value || 0) : 0;
+    };
+
+    const totalASN = getTotal('asnSD') + getTotal('asnTK');
+    const totalKebutuhan = getTotal('kebutuhanSD') + getTotal('kebutuhanTK');
+    const totalKekurangan = getTotal('kekuranganSD') + getTotal('kekuranganTK');
+
+    document.getElementById('cardASN').textContent = totalASN;
+    document.getElementById('cardKebutuhan').textContent = totalKebutuhan;
+    document.getElementById('cardKekurangan').textContent = totalKekurangan;
+
+    if (window.dashboardChart) window.dashboardChart.destroy();
+
+    window.dashboardChart = new Chart(document.getElementById('chartDashboard'), {
+      type: 'bar',
+      data: {
+        labels: ['ASN', 'Kebutuhan', 'Kekurangan'],
+        datasets: [{
+          data: [totalASN, totalKebutuhan, totalKekurangan],
+          backgroundColor: ['#4f46e5', '#10b981', '#ef4444']
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+  });
+
+});
+</script>
+
+</body>
+</html>
